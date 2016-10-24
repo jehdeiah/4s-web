@@ -1,0 +1,73 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	</ui:style>
+
+ 	<g:LayoutPanel width="700px" height="12em">
+ 		<g:layer left="5px" width="290px" height="10em">
+ 			<g:HTMLPanel>
+ 				<div style="width:290px; height:2.3em">
+ 					<div style="width:90px; height:2em; line-height:2em; float:left">Event Name : </div>
+					<div stlye="height:2em"><g:TextBox width="190px" ui:field="name"></g:TextBox></div>
+				</div>
+				<div style="width:290px; height:2.2em">
+ 					<div style="width:90px; height:2em; line-height:2em; float:left">Place : </div>
+ 					<div style="height:2em"><g:TextBox width="190px" ui:field="place"></g:TextBox></div>
+ 				</div>
+ 				<div style="width:280px; height:1.5em">Action Description : </div>
+ 				<g:TextArea width="280px" height="3em" ui:field="actionDescription"></g:TextArea>
+ 			</g:HTMLPanel>
+ 		</g:layer>
+ 		<g:layer left="315px" width="380px" height="10em">
+ 			<g:HTMLPanel>
+ 				<div style="width:370px; height:2em">
+ 					<div style="width:150px; height:2em; line-height:2em; float:left">Main Character : </div>
+ 					<g:ListBox width="220px" ui:field="mainCharacterSelect"></g:ListBox>
+ 				</div>
+ 				<div style="width:370px; height:1.5em">
+ 					<div style="width:215px; float:left">Involved Characters : </div>
+ 					<div>[Character List]</div>
+ 				</div>
+ 				<div style="width:370px; height:6em">
+ 					<div style="width:155px; height:100%; float:left">
+ 						<g:ListBox width="100%" height="100%" ui:field="involvedCharacter"></g:ListBox>
+ 					</div>
+ 					<div style="width:56px; margin-left:2px; margin-right:2px; height:100%; float:left; padding-top:1em">
+						<g:Button width="100%" ui:field="listToInvolve">&larr; Add</g:Button>
+						<g:Button width="100%" ui:field="involveToList">&rarr; Del</g:Button>
+					</div>
+ 					<div style="width:155px; height:100%; float:left">
+ 						<g:ListBox width="100%" height="100%" ui:field="listboxCharacter"></g:ListBox>
+ 					</div>
+ 				</div>
+ 			</g:HTMLPanel>
+ 		</g:layer>
+		<g:layer left='5' width='220px' top='10em' height='2em'>
+ 			<g:HTMLPanel>
+ 				<div style="width:90px; height:2em; line-height:2em; float:left">Story Time : </div>
+ 				<div style="width:130px; height:2em; float:left">
+ 					( <g:TextBox width='30px' readOnly="true" ui:field="storyIn" /> 
+ 					&rarr; <g:TextBox width='30px' readOnly="true" ui:field="storyOut"/> )
+ 				</div>
+ 			</g:HTMLPanel>
+ 		</g:layer>
+ 		<g:layer left='225px' width='470px' top='10em' height='2em' style="padding-left:5px; padding-right:5px">
+ 			<g:HTMLPanel>
+ 				<div style="width:85px; height:2em; line-height:2em; margin-right:5px; text-align:right; float:left">Plot Index : </div>
+ 				<div style="width:70px; height:2em; float:left">
+ 					<g:ListBox width='40px' ui:field="plotIndex"/>
+ 				</div>
+	 			<div style="width:110px; height:2em; line-height:2em; float:left">Discourse Time - </div>
+	 			<div style="width:30px; height:2em; line-height:2em; margin-right:5px; text-align:right; float:left">In : </div>
+	 			<div style="width:63px; float:left">
+	 				<g:TextBox width='50px' readOnly="true" ui:field="discourseIn"></g:TextBox>
+	 			</div>
+	 			<div style="width:30px; height:2em; line-height:2em; margin-right:5px; text-align:right; float:left">Out : </div>
+	 			<div style="width:60px; float:left">
+	 				<g:TextBox width='50px' readOnly="true" ui:field="discourseOut"></g:TextBox>
+	 			</div>
+	 		</g:HTMLPanel>
+ 		</g:layer>
+ 	</g:LayoutPanel>
+ </ui:UiBinder> 

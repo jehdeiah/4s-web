@@ -1,0 +1,106 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style type='com.googlecode._4s_web.client.StoryOverview.MyStyle'>
+	.legend {
+		font-weight: bold;
+		font-size: large;
+	}
+	.roundrect {
+		position: absolute;
+		padding: 10px;
+		border: 2px solid;
+		border-color: #eee;
+		border-radius: 10px;
+		background-color: whitesmoke;
+	}
+	.headerStyle {
+		background: #ddddff;
+		font-weight: bold;
+	}
+	.focusedRow {
+		background-color: aliceblue;
+	}
+	.selectedRow {
+		background-color: antiquewhite;
+		font-weight: bold;
+	}
+	</ui:style>
+	<g:LayoutPanel>
+		<g:layer left='0' width='50%' top='1em' bottom='1em'>
+			<g:HTMLPanel>
+				<div class="{style.roundrect}" style="left:1em; right:1em; top:1em; height:5em;">
+					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
+						<g:Label styleName="{style.legend}">Title :</g:Label>
+					</div>
+					<div style="position:absolute; left:10px; right:20px; top:3em; height:2em; line-height:2em;">
+						<g:TextBox width="100%" ui:field="title"></g:TextBox>
+					</div>
+				</div>
+
+				<div class="{style.roundrect}" style="left:1em; right:1em; top:9em; height:10em">
+
+					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
+						<g:Label styleName="{style.legend}">Thematic Idea :</g:Label>
+					</div>
+					<div style="position:absolute; left:10px; right:20px; top:3em; bottom:1em;">
+						<g:TextArea width="100%" height="100%" ui:field="idea"></g:TextArea>
+					</div>
+				</div>
+
+				<div class="{style.roundrect}" style="left:1em; right:1em; top:22em; bottom:1em; height:38em">
+					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
+						<g:Label styleName="{style.legend}">Anomaly Detection:</g:Label>
+					</div>
+					<div style="position:absolute; right:10px; width:5em; top:10px; height:2em; text-align:right">
+						<g:Button ui:field="anomalyDetectionProcess">Process</g:Button>
+					</div>
+					<div style="position:absolute; left:10px; right:20px; top:3em; bottom:1em;">
+						<g:TextArea width="100%" height="100%" ui:field="anomalyDetection"></g:TextArea>
+					</div>
+				</div>
+
+				<div class="{style.roundrect}" style="left:1em; right:1em; bottom:1em; height:3em;">
+					<div style="position:relative; float:left; width:100%; height:2em; line-height:2em;">
+						<g:Label styleName="{style.legend}">Discourse Duration :</g:Label>
+						<g:TextBox>2:00:00.000</g:TextBox>
+					</div>
+				</div>
+
+			</g:HTMLPanel>
+		</g:layer>
+		<g:layer left='50%' width='50%' top='1em' bottom='1em'>
+			<g:HTMLPanel>
+				<div class="{style.roundrect}" style="left:1em; right:1em; top:1em; bottom:1em;">
+					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
+						<g:Label styleName="{style.legend}">Story List :</g:Label>
+					</div>
+					<div style="position:absolute; right:210px; width:10em; top:10px; height:2em; text-align:right">
+						<g:Button ui:field="createNew">Create New Story</g:Button>
+					</div>
+					<div style="position:absolute; right:145px; width:5em; top:10px; height:2em; text-align:right">
+						<g:Button ui:field="importFile">Import</g:Button>
+					</div>
+					<div style="position:absolute; right:80px; width:5em; top:10px; height:2em; text-align:right">
+						<g:Button ui:field="exportFile">Export</g:Button>
+					</div>
+					<div style="position:absolute; right:10px; width:5em; top:10px; height:2em; text-align:right">
+						<g:Button ui:field="refresh">Refresh</g:Button>
+					</div>
+					<div id="story_list" style="position:absolute; left:10px; right:10px; top:3em; bottom:1em; background:white">
+						<g:Grid width="100%" ui:field="storyList">
+							<g:row styleName="{style.headerStyle}">
+								<g:customCell>
+									<g:Label>Title</g:Label>
+								</g:customCell>
+								<g:customCell>
+									<g:Label>Theme</g:Label>
+								</g:customCell>
+							</g:row>
+						</g:Grid>
+					</div>
+				</div>
+			</g:HTMLPanel>
+		</g:layer>
+	</g:LayoutPanel>
+</ui:UiBinder> 

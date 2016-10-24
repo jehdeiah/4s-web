@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='com.googlecode._4s_web.StoryApp' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/StoryApp/greet" class="com.googlecode._4s_web.server.GreetingServiceImpl" />
+
+</module>

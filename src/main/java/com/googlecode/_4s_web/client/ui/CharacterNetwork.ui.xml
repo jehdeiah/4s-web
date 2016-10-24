@@ -1,0 +1,8 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style type="com.googlecode._4s_web.client.ui.CharacterNetwork.MyStyle">
+		.node text { pointer-events: none; font: 10px sans-serif;}
+	</ui:style>
+	<g:FlowPanel ui:field='drawingPanel'></g:FlowPanel>
+</ui:UiBinder> 

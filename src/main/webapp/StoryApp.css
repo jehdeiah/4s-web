@@ -53,6 +53,21 @@ h1 {
 	font-weight: bold;
 }
 
+.tabBar {
+	position: relative;
+	top: 0;
+	height: calc(2em - 6px);
+	text-align: center;
+	padding: 3px 10px 0px 10px;
+	margin: 3px 10px 0px 0px;
+	font-weight: bold;
+	background-color: #e3e3e3;
+	float: left;
+}
+.tabBar-selected {
+	background-color: #bcbcbc;
+}
+
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
   width: 400px;

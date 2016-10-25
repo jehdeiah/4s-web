@@ -7,12 +7,23 @@ import java.util.Queue;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,6 +35,7 @@ import com.googlecode._4s_web.client.entity.StoryTimePoint;
 import com.googlecode._4s_web.client.ui.AbstractStoryPanel;
 import com.googlecode._4s_web.client.ui.CategoryView;
 import com.googlecode._4s_web.client.ui.CharacterNetwork;
+import com.googlecode._4s_web.client.ui.CheckList;
 import com.googlecode._4s_web.client.ui.DiscourseTimeline;
 import com.googlecode._4s_web.client.ui.EventNetwork;
 import com.googlecode._4s_web.client.ui.KnowledgeStructure;
@@ -64,21 +76,77 @@ public class StoryApp implements EntryPoint {
 	 */
 	StoryEntity story = null;
 
+	/**
+	 * Tab header 상자에 대한 마우스 이벤트 핸들러.
+	 */
+	class TabHeaderMouseHandler implements MouseUpHandler, MouseOverHandler, MouseOutHandler {
+
+		TabHeaderUI tabHeaderUI;
+		
+		public TabHeaderMouseHandler(TabHeaderUI e) {
+			tabHeaderUI = e;
+		}
+
+		@Override
+		public void onMouseUp(MouseUpEvent event) {
+			int clickedTabId = tabHeaderUI.getId();
+			int currentTabId = tabLayoutPanel.getSelectedIndex(); 
+			if (currentTabId != clickedTabId) {
+				tabLayoutPanel.selectTab(clickedTabId);
+				tabHeaderUIs[currentTabId].removeStyleName("tabBar-selected");
+				tabHeaderUIs[clickedTabId].addStyleName("tabBar-selected");
+			}
+		}
+
+		@Override
+		public void onMouseOver(MouseOverEvent event) {
+			tabHeaderUI.getElement().getStyle().setCursor(Cursor.POINTER);
+		}
+
+		@Override
+		public void onMouseOut(MouseOutEvent event) {
+			tabHeaderUI.getElement().getStyle().setCursor(Cursor.AUTO);
+		}
+	}
+	/**
+	 * Tab header
+	 */
+	class TabHeaderUI extends Label {
+		int id;
+		public TabHeaderUI(String text, int id) {
+			super(text);
+			this.id = id;
+			setStyleName("tabBar");
+			TabHeaderMouseHandler h = new TabHeaderMouseHandler(this);
+			addMouseUpHandler(h);
+			addMouseOverHandler(h);
+			addMouseOutHandler(h);
+		}
+		public int getId() {
+			return id;
+		}
+	}
+	
 	/*
 	 * 탭 목록. 
 	 * 반드시 이 순서대로 탭을 추가하여 getWidget(index)로 탭을 얻을 수 있게 한다.
 	 */
-	final int TAB_OVERVIEW = 0;
-	final int TAB_STORY_TIMELINE = 1;
-	final int TAB_DISCOURSE_TIMELINE = 2;
-	final int TAB_KNOWLEDGE_STRUCTURE = 3;
-	//final int TAB_KNOWLEDGE_FLOW = 4;
-	final int TAB_CATEGORY_VIEW = 4;
-	final int TAB_CHARACTER_NETWORK = 5;
-	final int TAB_EVENT_NETWORK = 6;
-	final String[] tabHeader = { "Story Overview", "Event & Story Time-line",
-			"Event & Discourse Time-line", "Knowledge Structure" //};
-			, "Category View", "Character Network", "Event Network"};
+	final int NUM_TAB_IN = 4;
+	final int TAB_IN_OVERVIEW = 0;
+	final int TAB_IN_STORY_TIMELINE = 1;
+	final int TAB_IN_DISCOURSE_TIMELINE = 2;
+	final int TAB_IN_KNOWLEDGE_STRUCTURE = 3;
+	final int TAB_OUT_CHECKLIST = 4;
+	final int TAB_OUT_NETWORK = 5;
+	final int TAB_OUT_QA_PATTERN = 6;
+	final int TAB_OUT_KNOWLEDGE_FLOW = 7;
+	final int TAB_OUT_CATEGORY_VIEW = 8;
+	final int TAB_OUT_COMPLEXITY = 9;
+	final int TAB_OUT_SUSPENSE = 10;
+	final String[] tabHeader = { "Narrative Overview", "Story-time Organizer",
+			"Discourse-time Organizer", "Knowledge Structure",
+			"Check List", "Character & Event Graph", "Q&A Pattern",
+			"Knowledge Flow", "Category View", "Complexity", "Suspense Situation"};
 	Widget[] tabWidget = new Widget[tabHeader.length];
 
 	/**
@@ -90,6 +158,10 @@ public class StoryApp implements EntryPoint {
 	 * 편집화면들이 모여있는 탭 레이아웃 패널 
 	 */
 	TabLayoutPanel tabLayoutPanel;
+	FlowPanel inputTabBar;
+	FlowPanel outputTabBar;
+	TabHeaderUI[] tabHeaderUIs;
+	int currentTabId = 0;
 	
 	/*
 	 * 자료 저장 요청과 탭 전환 처리
@@ -168,23 +240,45 @@ public class StoryApp implements EntryPoint {
 		 * 탭 레이아웃. 
 		 */
 		RootPanel divPanel = RootPanel.get("workspace");
-		tabLayoutPanel = new TabLayoutPanel(3, Unit.EM);
+		tabLayoutPanel = new TabLayoutPanel(0, Unit.EM);
+		inputTabBar = new FlowPanel();
+		outputTabBar = new FlowPanel();
+		tabHeaderUIs = new TabHeaderUI[tabHeader.length];
+		for (int i=0; i<tabHeaderUIs.length; i++)
+		{
+			tabHeaderUIs[i] = new TabHeaderUI(tabHeader[i], i);
+		}
 		/*
 		 * FIXME: 성능을 위해 lazy loading을 고려해 보았으나 문제가 좀 있다. LazyPanel을 쓰면 패널이므로 위젯이
 		 * <div>로 감싸지는데, 이것 때문에 레이아웃이 깨지는 것 같다. 나중에 필요하면 위젯 치환으로 고치자.
 		 */
-		StoryOverview so = new StoryOverview(storyService, mainBus);
 		DiscourseTimeline dt = new DiscourseTimeline(storyService, mainBus);
-		tabWidget[TAB_OVERVIEW] = so; 
-		tabWidget[TAB_STORY_TIMELINE] = new StoryTimeline(storyService, mainBus);
-		tabWidget[TAB_DISCOURSE_TIMELINE] = dt;  
-		tabWidget[TAB_KNOWLEDGE_STRUCTURE] = new KnowledgeStructure(storyService, mainBus);
-		tabWidget[TAB_CATEGORY_VIEW] = new CategoryView(storyService, mainBus);
-		tabWidget[TAB_CHARACTER_NETWORK] = new CharacterNetwork();
-		tabWidget[TAB_EVENT_NETWORK] = new EventNetwork();
-		so.addDiscourseTimeline(dt);
+		// Split panel for character & event graphs
+		LayoutPanel cen = new LayoutPanel();
+		CharacterNetwork cn = new CharacterNetwork();
+		EventNetwork en = new EventNetwork();
+		cen.add(cn);
+		cen.add(en);
+		cen.setWidgetLeftWidth(cn, 0, Unit.PCT, 50, Unit.PCT);
+		cen.setWidgetRightWidth(en, 0, Unit.PCT, 50, Unit.PCT);
+		// checklist
+		CheckList cl = new CheckList();
+		cl.addDiscourseTimeline(dt);
+		tabWidget[TAB_IN_OVERVIEW] = new StoryOverview(storyService, mainBus); 
+		tabWidget[TAB_IN_STORY_TIMELINE] = new StoryTimeline(storyService, mainBus);
+		tabWidget[TAB_IN_DISCOURSE_TIMELINE] = dt;  
+		tabWidget[TAB_IN_KNOWLEDGE_STRUCTURE] = new KnowledgeStructure(storyService, mainBus);
+		tabWidget[TAB_OUT_CHECKLIST] = cl;
+		tabWidget[TAB_OUT_NETWORK] = cen;
+		tabWidget[TAB_OUT_QA_PATTERN] = new HTML("Q&A Pattern");
+		tabWidget[TAB_OUT_KNOWLEDGE_FLOW] = new HTML("Knowledge flow");
+		tabWidget[TAB_OUT_CATEGORY_VIEW] = new CategoryView(storyService, mainBus);
+		tabWidget[TAB_OUT_COMPLEXITY] = new HTML("Complexity");
+		tabWidget[TAB_OUT_SUSPENSE] = new HTML("Suspense situation");
 		// 개요 탭만 추가하고, 스토리를 고르면 나머지 탭들을 추가한다.
-		tabLayoutPanel.add(tabWidget[TAB_OVERVIEW], tabHeader[TAB_OVERVIEW]);
+		inputTabBar.add(tabHeaderUIs[0]);
+		tabHeaderUIs[0].addStyleName("tabBar-selected");
+		tabLayoutPanel.add(tabWidget[TAB_IN_OVERVIEW], tabHeader[TAB_IN_OVERVIEW]);
 		
 		tabLayoutPanel.setHeight("100%");
 		
@@ -200,17 +294,17 @@ public class StoryApp implements EntryPoint {
 				selectionDone = false;
 				int previous = tabLayoutPanel.getSelectedIndex();
 				switch (previous) {
-				case TAB_OVERVIEW:
+				case TAB_IN_OVERVIEW:
 					break;
-				case TAB_STORY_TIMELINE:
-				case TAB_DISCOURSE_TIMELINE:
-				case TAB_KNOWLEDGE_STRUCTURE:
-				case TAB_CATEGORY_VIEW:
+				case TAB_IN_STORY_TIMELINE:
+				case TAB_IN_DISCOURSE_TIMELINE:
+				case TAB_IN_KNOWLEDGE_STRUCTURE:
+				case TAB_OUT_CATEGORY_VIEW:
 					AbstractStoryPanel panel = (AbstractStoryPanel)tabLayoutPanel.getWidget(previous);
 					panel.invalidate();
 					panel.applyChanges();
 					break;
-				case TAB_CHARACTER_NETWORK:
+				case TAB_OUT_NETWORK:
 					// 캐릭터 속성 등을 바꿀 수 있다.
 					RequestEntityBuffer.flush(); 
 					break;
@@ -239,6 +333,10 @@ public class StoryApp implements EntryPoint {
 			}
 		});
 		divPanel.add(tabLayoutPanel);
+		divPanel = RootPanel.get("inputBar");
+		divPanel.add(inputTabBar);
+		divPanel = RootPanel.get("outputBar");
+		divPanel.add(outputTabBar);
 	}
 
 	/**
@@ -248,19 +346,20 @@ public class StoryApp implements EntryPoint {
 		tabLayoutPanel.forceLayout();
 		int tab = tabLayoutPanel.getSelectedIndex();
 		switch (tab) {
-		case TAB_OVERVIEW:
+		case TAB_IN_OVERVIEW:
 			break;
-		case TAB_STORY_TIMELINE:
-		case TAB_DISCOURSE_TIMELINE:
-		case TAB_KNOWLEDGE_STRUCTURE:
-		case TAB_CATEGORY_VIEW:
+		case TAB_IN_STORY_TIMELINE:
+		case TAB_IN_DISCOURSE_TIMELINE:
+		case TAB_IN_KNOWLEDGE_STRUCTURE:
+		case TAB_OUT_CATEGORY_VIEW:
 			((AbstractStoryPanel)tabLayoutPanel.getWidget(tab)).updateAll();
 			break;
-		case TAB_CHARACTER_NETWORK:
-			((CharacterNetwork)tabLayoutPanel.getWidget(tab)).draw();
+		case TAB_OUT_NETWORK:
+			((CharacterNetwork)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).draw();
+			((EventNetwork)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(1)).draw();
 			break;
-		case TAB_EVENT_NETWORK:
-			((EventNetwork)tabLayoutPanel.getWidget(tab)).draw();
+		default:
+			/// TODO
 			break;
 		}
 	}
@@ -290,12 +389,18 @@ public class StoryApp implements EntryPoint {
 					while (tabLayoutPanel.getWidgetCount() > 1) {
 						tabLayoutPanel.remove(1);
 					}
+					inputTabBar.clear();
+					inputTabBar.add(tabHeaderUIs[0]);
+					tabHeaderUIs[0].addStyleName("tabBar-selected");
+					outputTabBar.clear();
 				}
 	
 				public void onSuccess(Void result) {
 					if (tabLayoutPanel.getWidgetCount() == 1) {
 						for (int i=1; i<tabWidget.length; i++) {
 							tabLayoutPanel.add(tabWidget[i], tabHeader[i]);
+							if (i < NUM_TAB_IN) inputTabBar.add(tabHeaderUIs[i]);
+							else outputTabBar.add(tabHeaderUIs[i]);
 						}
 					}
 					/*

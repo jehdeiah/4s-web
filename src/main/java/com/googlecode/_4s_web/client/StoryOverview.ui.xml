@@ -6,6 +6,14 @@
 		font-weight: bold;
 		font-size: large;
 	}
+	.legend_float {
+		font-weight: bold;
+		font-size: large;
+		float: left;
+	}
+	.margin_left {
+	    margin-left: 20px;
+	}
 	.roundrect {
 		position: absolute;
 		padding: 10px;
@@ -38,7 +46,7 @@
 					</div>
 				</div>
 
-				<div class="{style.roundrect}" style="left:1em; right:1em; top:9em; height:10em">
+				<div class="{style.roundrect}" style="left:1em; right:1em; top:9em; bottom:5em">
 
 					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
 						<g:Label styleName="{style.legend}">Thematic Idea :</g:Label>
@@ -48,22 +56,10 @@
 					</div>
 				</div>
 
-				<div class="{style.roundrect}" style="left:1em; right:1em; top:22em; bottom:1em; height:38em">
-					<div style="position:absolute; width:100%; height:2em; line-height:2em;">
-						<g:Label styleName="{style.legend}">Anomaly Detection:</g:Label>
-					</div>
-					<div style="position:absolute; right:10px; width:5em; top:10px; height:2em; text-align:right">
-						<g:Button ui:field="anomalyDetectionProcess">Process</g:Button>
-					</div>
-					<div style="position:absolute; left:10px; right:20px; top:3em; bottom:1em;">
-						<g:TextArea width="100%" height="100%" ui:field="anomalyDetection"></g:TextArea>
-					</div>
-				</div>
-
 				<div class="{style.roundrect}" style="left:1em; right:1em; bottom:1em; height:3em;">
 					<div style="position:relative; float:left; width:100%; height:2em; line-height:2em;">
-						<g:Label styleName="{style.legend}">Discourse Duration :</g:Label>
-						<g:TextBox>2:00:00.000</g:TextBox>
+						<g:Label styleName="{style.legend_float}">Discourse Duration :</g:Label>
+						<g:TextBox styleName="{style.margin_left}">2:00:00.000</g:TextBox>
 					</div>
 				</div>
 

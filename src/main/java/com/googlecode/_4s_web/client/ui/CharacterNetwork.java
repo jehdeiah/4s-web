@@ -50,7 +50,7 @@ public class CharacterNetwork extends Composite
 		var links = JSON.parse(linkString);
 		
 		$wnd.d3.select('#character-graph').select("svg").remove();	
-		$wnd.d3.select('#event-graph').select("svg").remove();	
+		//$wnd.d3.select('#event-graph').select("svg").remove();	
 		var color = $wnd.d3.scale.ordinal().range(["#00ff00", "#ff0000", "#0000ff"]); 
 		var base_node_radius = 15, link_strength_threshold = 0.25;
 		//var width = 1080, height = 800; 

@@ -2281,7 +2281,7 @@ public class StoryTimeline extends AbstractStoryPanel
 		}
 		timepointSet.addAll(annotedTimepoint.keySet());
 		// 선 긋기 
-		Collection<SimplePanel> timelineList = timelineBag.values();
+		ArrayList<SimplePanel> timelineList = new ArrayList<SimplePanel>(timelineBag.values());
 		Iterator<SimplePanel> iter = timelineList.iterator();
 		timelineBag.clear();
 		int i = 0;

@@ -264,6 +264,9 @@ public class StoryApp implements EntryPoint {
 		// checklist
 		CheckList cl = new CheckList();
 		cl.addDiscourseTimeline(dt);
+		// Split panel for complexity analysis
+		LayoutPanel cmp = new LayoutPanel();
+		
 		tabWidget[TAB_IN_OVERVIEW] = new StoryOverview(storyService, mainBus); 
 		tabWidget[TAB_IN_STORY_TIMELINE] = new StoryTimeline(storyService, mainBus);
 		tabWidget[TAB_IN_DISCOURSE_TIMELINE] = dt;  

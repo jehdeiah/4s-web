@@ -59,7 +59,7 @@ public class EventNetwork extends Composite
 		var thisPanel = this;
 		var nodes = JSON.parse(nodeString);
 		var links = JSON.parse(linkString);
-		alert(subLinkString);
+		//alert(subLinkString);
 		function createGraph(nodes, links) {
 			// 
 			// START OF Preprocessing
@@ -98,7 +98,7 @@ public class EventNetwork extends Composite
 			// START OF Visualization preparation
 			//
 			//Re-initialize DOM objects
-			$wnd.d3.select('#character-graph').select("svg").remove();
+			//$wnd.d3.select('#character-graph').select("svg").remove();
 			$wnd.d3.select('#event-graph').select("svg").remove();	
 			
 			//Set Force algorithm visualization features
@@ -429,7 +429,7 @@ public class EventNetwork extends Composite
 		 *  Get to-be-JSON string for supplementary annotation links
 		 */
 	    Random r = new Random();
-	    String subLinks = "[";
+	    String subLinks = "[ ";
 	    
 	    for (EventRelationEntity er : LocalCache.entities(EventRelationEntity.class, eventRelationArrayType)){
 	    	subLinks += 

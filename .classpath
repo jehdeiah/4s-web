@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/smart-storytelling-0.0.1-SNAPSHOT/WEB-INF/classes" path="src/main/java">
+	<classpathentry kind="src" output="target/4s-web-0.0.1-SNAPSHOT/WEB-INF/classes" path="src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
@@ -37,12 +37,12 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="target/smart-storytelling-0.0.1-SNAPSHOT/WEB-INF/classes" path="target/generated-sources/gwt">
+	<classpathentry kind="src" output="target/4s-web-0.0.1-SNAPSHOT/WEB-INF/classes" path="target/generated-sources/gwt">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
-	<classpathentry kind="output" path="target/smart-storytelling-0.0.1-SNAPSHOT/WEB-INF/classes"/>
+	<classpathentry kind="output" path="target/4s-web-0.0.1-SNAPSHOT/WEB-INF/classes"/>
 </classpath>

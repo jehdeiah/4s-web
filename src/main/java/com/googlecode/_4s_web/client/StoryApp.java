@@ -22,6 +22,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -39,6 +40,7 @@ import com.googlecode._4s_web.client.ui.CheckList;
 import com.googlecode._4s_web.client.ui.DiscourseTimeline;
 import com.googlecode._4s_web.client.ui.EventNetwork;
 import com.googlecode._4s_web.client.ui.KnowledgeStructure;
+import com.googlecode._4s_web.client.ui.NetworkComplexity;
 import com.googlecode._4s_web.client.ui.StoryTimeline;
 
 /**
@@ -266,6 +268,12 @@ public class StoryApp implements EntryPoint {
 		cl.addDiscourseTimeline(dt);
 		// Split panel for complexity analysis
 		LayoutPanel cmp = new LayoutPanel();
+		NetworkComplexity netcomp = new NetworkComplexity();
+		HTMLPanel entcomp = new HTMLPanel("<h1>Entropy-based Complexity</h1>");
+		cmp.add(netcomp);
+		cmp.add(entcomp);
+		cmp.setWidgetLeftWidth(netcomp, 0, Unit.PCT, 50, Unit.PCT);
+		cmp.setWidgetRightWidth(entcomp, 0, Unit.PCT, 50, Unit.PCT);
 		
 		tabWidget[TAB_IN_OVERVIEW] = new StoryOverview(storyService, mainBus); 
 		tabWidget[TAB_IN_STORY_TIMELINE] = new StoryTimeline(storyService, mainBus);
@@ -276,7 +284,7 @@ public class StoryApp implements EntryPoint {
 		tabWidget[TAB_OUT_QA_PATTERN] = new HTML("Q&A Pattern");
 		tabWidget[TAB_OUT_KNOWLEDGE_FLOW] = new HTML("Knowledge flow");
 		tabWidget[TAB_OUT_CATEGORY_VIEW] = new CategoryView(storyService, mainBus);
-		tabWidget[TAB_OUT_COMPLEXITY] = new HTML("Complexity");
+		tabWidget[TAB_OUT_COMPLEXITY] = cmp;
 		tabWidget[TAB_OUT_SUSPENSE] = new HTML("Suspense situation");
 		// 개요 탭만 추가하고, 스토리를 고르면 나머지 탭들을 추가한다.
 		inputTabBar.add(tabHeaderUIs[0]);
@@ -310,6 +318,12 @@ public class StoryApp implements EntryPoint {
 				case TAB_OUT_NETWORK:
 					// 캐릭터 속성 등을 바꿀 수 있다.
 					RequestEntityBuffer.flush(); 
+					break;
+				case TAB_OUT_CHECKLIST:
+				case TAB_OUT_QA_PATTERN:
+				case TAB_OUT_KNOWLEDGE_FLOW:
+				case TAB_OUT_COMPLEXITY:
+				case TAB_OUT_SUSPENSE:
 					break;
 				}
 			}
@@ -361,8 +375,12 @@ public class StoryApp implements EntryPoint {
 			((CharacterNetwork)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).draw();
 			((EventNetwork)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(1)).draw();
 			break;
-		default:
-			/// TODO
+		case TAB_OUT_CHECKLIST:
+		case TAB_OUT_QA_PATTERN:
+		case TAB_OUT_KNOWLEDGE_FLOW:
+		case TAB_OUT_COMPLEXITY:
+			((NetworkComplexity)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).analyze();
+		case TAB_OUT_SUSPENSE:
 			break;
 		}
 	}

@@ -333,7 +333,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 		 * 화면 픽셀 위치를 입력으로 받고 배율 처리가 쉽도록 퍼센트 위치로 변환하여 스타일을 지정한다.
 		 * 
 		 * @param left
-		 * @param width
+		 * @param right
 		 */
 		public void updateWidgetPosition(int left, int right) {
 			assert widget.isAttached();
@@ -868,12 +868,12 @@ public class DiscourseTimeline extends AbstractStoryPanel
 			if (right > timelineEditor.getOffsetWidth())
 				right = timelineEditor.getOffsetWidth();
 			discourseEventBag.remove(event);
-			plotInstanceSetOfEvent.get(event).remove(event);
+			plotInstanceSetOfEvent.get(event.getId()).remove(event);
 			// Deprecated: 테두리 보정: 실제로 그릴 때 테두리 기준으로 그리려고 위젯 너비를 줄이므로 아예 늘려서 넘겨준다.
 			event.updateWidgetPosition(start, right);// + EventUI.BorderWidth * 2);
 			event.modify();
 			discourseEventBag.add(event);
-			plotInstanceSetOfEvent.get(event).add(event);
+			plotInstanceSetOfEvent.get(event.getId()).add(event);
 		}
 		updateDiscourseTimePoints();
 	}
@@ -993,7 +993,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 				double beginPCT = getTimelineX(eUI.getWidgetLeft());
 				double endPCT = getTimelineX(eUI.getWidgetRight());
 				e.addToDiscourse(beginPCT, endPCT);
-				//eUI.setDiscourseInOut(beginPCT, endPCT);
+				eUI.setDiscourseInOut(beginPCT, endPCT);
 			}
 			set.add(eUI);
 			discourseEventBag.add(eUI);
@@ -1033,7 +1033,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 			int left = getTimelineOffsetX(r.getBegin());
 			int right = getTimelineOffsetX(r.getEnd());
 			eUI.updateWidgetPosition(left, right);
-			//eUI.setDiscourseInOut(r.getBegin(), r.getEnd());
+			eUI.setDiscourseInOut(r.getBegin(), r.getEnd());
 			discourseEventBag.add(eUI);
 			plotCount++;
 		}

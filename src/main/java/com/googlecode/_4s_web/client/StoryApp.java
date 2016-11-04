@@ -39,6 +39,7 @@ import com.googlecode._4s_web.client.ui.CharacterNetwork;
 import com.googlecode._4s_web.client.ui.CheckList;
 import com.googlecode._4s_web.client.ui.DiscourseTimeline;
 import com.googlecode._4s_web.client.ui.EventNetwork;
+import com.googlecode._4s_web.client.ui.KnowledgeFlow;
 import com.googlecode._4s_web.client.ui.KnowledgeStructure;
 import com.googlecode._4s_web.client.ui.NetworkComplexity;
 import com.googlecode._4s_web.client.ui.StoryTimeline;
@@ -95,9 +96,11 @@ public class StoryApp implements EntryPoint {
 			int currentTabId = tabLayoutPanel.getSelectedIndex(); 
 			if (currentTabId != clickedTabId) {
 				tabLayoutPanel.selectTab(clickedTabId);
-				tabHeaderUIs[currentTabId].removeStyleName("tabBar-selected");
-				tabHeaderUIs[clickedTabId].addStyleName("tabBar-selected");
 			}
+			// There may be exceptions to make wrong...
+			for (int i=0; i<tabHeaderUIs.length; i++)
+				tabHeaderUIs[i].removeStyleName("tabBar-selected");
+			tabHeaderUIs[clickedTabId].addStyleName("tabBar-selected");
 		}
 
 		@Override
@@ -266,6 +269,14 @@ public class StoryApp implements EntryPoint {
 		// checklist
 		CheckList cl = new CheckList();
 		cl.addDiscourseTimeline(dt);
+		// Split panel for knowledge flow
+		LayoutPanel kf = new LayoutPanel();
+		KnowledgeFlow kf1 = new KnowledgeFlow("Knowledge Flow 1");
+		KnowledgeFlow kf2 = new KnowledgeFlow("Knowledge Flow 2");
+		kf.add(kf1);
+		kf.add(kf2);
+		kf.setWidgetLeftWidth(kf1, 0, Unit.PCT, 50, Unit.PCT);
+		kf.setWidgetRightWidth(kf2, 0, Unit.PCT, 50, Unit.PCT);
 		// Split panel for complexity analysis
 		LayoutPanel cmp = new LayoutPanel();
 		NetworkComplexity netcomp = new NetworkComplexity();
@@ -282,7 +293,7 @@ public class StoryApp implements EntryPoint {
 		tabWidget[TAB_OUT_CHECKLIST] = cl;
 		tabWidget[TAB_OUT_NETWORK] = cen;
 		tabWidget[TAB_OUT_QA_PATTERN] = new HTML("Q&A Pattern");
-		tabWidget[TAB_OUT_KNOWLEDGE_FLOW] = new HTML("Knowledge flow");
+		tabWidget[TAB_OUT_KNOWLEDGE_FLOW] = kf;
 		tabWidget[TAB_OUT_CATEGORY_VIEW] = new CategoryView(storyService, mainBus);
 		tabWidget[TAB_OUT_COMPLEXITY] = cmp;
 		tabWidget[TAB_OUT_SUSPENSE] = new HTML("Suspense situation");
@@ -376,10 +387,16 @@ public class StoryApp implements EntryPoint {
 			((EventNetwork)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(1)).draw();
 			break;
 		case TAB_OUT_CHECKLIST:
+			break;
 		case TAB_OUT_QA_PATTERN:
+			break;
 		case TAB_OUT_KNOWLEDGE_FLOW:
+			((KnowledgeFlow)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).analyze();
+			((KnowledgeFlow)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(1)).analyze();
+			break;
 		case TAB_OUT_COMPLEXITY:
 			((NetworkComplexity)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).analyze();
+			break;
 		case TAB_OUT_SUSPENSE:
 			break;
 		}

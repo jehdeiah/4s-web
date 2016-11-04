@@ -45,11 +45,11 @@
 #				infomation=c(1:m) index vector,
 #				no.knowledge=l,
 #				knowledge=(vector of knowledge names),
-#				percept=array[event, agent(index), info],
-#				impact=array[info, knowledge],
+#				percept=array[event, agent(index), info, value],
+#				impact=array[info, knowledge, value],
 #				info.rule=list of list(type="CO" or "RS" or "RE", args=(info vector),
-#                               initial.state=array[agent(index), knowledge], # including reader
-#                               initial.state.by.reader=array[agent(index), knowledge]) # reader's assumption about characters
+#       initial.state=array[agent(index), knowledge], # including reader
+#       initial.state.by.reader=array[agent(index), knowledge]) # reader's assumption about characters
 
 #===========================================================
 # Handling Information Rules
@@ -121,7 +121,7 @@ information.rule <- function(rule.monitor, info) {
 init.rule.monitor <- function(rules) {
     monitor <- list(cursor=NULL, assert.CO=FALSE, reversal=NULL, recurrent.knowledge=NULL, assert.NE=FALSE)
     cursor <- NULL
-    for (r in c(1:length(rules))) {
+    for (r in seq_along(rules)) {
         c <- list(rule=rules[[r]], open=rules[[r]]$args, closed=NULL, fired=FALSE)
         cursor <- append(cursor, list(c))
     }
@@ -149,7 +149,7 @@ init.rule.monitor <- function(rules) {
 # The model parameter is the probability distribution of the truth of hypothesis.
 Bayesian.init <- function(no.knowledge, pos=NULL, neg=NULL) {
     prior <- array(0.5, dim=c(no.knowledge,2))
-    for (i in 1:no.knowledge) {
+    for (i in seq_len(no.knowledge)) {
         if (!is.null(pos)) prior[i,1] <- pos[i]
         if (!is.null(neg)) prior[i,2] <- neg[i]
         if (sum(prior[i,]) != 0) prior[i,] <- prior[i,]/sum(prior[i,])
@@ -195,7 +195,7 @@ Bayesian <- list(base=NULL, init=Bayesian.init, update=Bayesian.update, state=Ba
 # Initial mass setting. DoB 0 is the mass of (0,0,0,1)
 DST.init <- function(no.knowledge, pos=NULL, neg=NULL) {
     mass <- array(0, dim=c(no.knowledge,4))
-    for (i in 1:no.knowledge) {
+    for (i in seq_len(no.knowledge)) {
         m <- c(0,0,0,0)
         if (!is.null(pos)) m[2] <- pos[i]
         if (!is.null(neg)) m[3] <- neg[i]
@@ -267,7 +267,7 @@ DST <- list(base=NULL, init=DST.init, update=DST.update, state=DST.state)
 target.index <- function(set, target) {
     tlist <- target
     if (is.character(target) && target=="all") tlist <- set
-    seq <- c(1:length(set))
+    seq <- seq_along(set)
     index <- NULL
     for (i in tlist) index <- append(index, seq[set==i])
     index
@@ -286,8 +286,8 @@ knowledge.flow <- function(knowledge.structure, agent="all",
     story <- knowledge.structure$story
     agent.list <- target.index(story$agent, agent)
     kn.list <- target.index(knowledge.structure$knowledge, knowledge)
-    kn.seq <- c(1:knowledge.structure$no.knowledge)
-    kn.flow <- array(NA, dim=c(length(agent.list),length(kn.list),story$no.events))
+    kn.seq <- seq_len(knowledge.structure$no.knowledge)
+    kn.flow <- array(NA, dim=c(length(agent.list),length(kn.list),length(story$plot.seq)))
     for (i.agent in agent.list) {
         event.seq <- story$plot.seq # discourse order by default, changed below when story order is requested.
     	rule.monitor <- init.rule.monitor(knowledge.structure$info.rule)
@@ -317,7 +317,7 @@ knowledge.flow <- function(knowledge.structure, agent="all",
                     }
                 }
                 if (!rule.monitor$assert.CO && !rule.monitor$assert.NE) {
-                    kn.affected <- c(1:knowledge.structure$no.knowledge)[knowledge.structure$impact[i.info,] != 0]
+                    kn.affected <- seq_len(knowledge.structure$no.knowledge)[knowledge.structure$impact[i.info,] != 0]
                     # filtering by recurrent knowledge
                     kn.affected <- kn.affected[!kn.affected %in% rule.monitor$recurrent.knowledge]
                     kn.affected <- kn.affected[kn.affected %in% kn.list]
@@ -414,14 +414,14 @@ narrative.complexity <- function(no.events,
     m <- length(r.agents) + 2
     n <- m + 2
     cp.entropy <- array(0,c(n,no.events))
-    for (k in c(1:length(k.desired))) {
+    for (k in seq_along(k.desired)) {
         cp.entropy[1,] <- cp.entropy[1,] + entropy(kf.of.reader[k,]/2+0.5)
         cp.entropy[m,] <- cp.entropy[1,]
         for (a in c(2:(m-1))) {
             cp.entropy[a,] <- cp.entropy[a,] + cross.entropy(kf.of.reader[k,]/2+0.5,kf.r[r.agents[a-1],k,]/2+0.5)
             cp.entropy[m,] <- cp.entropy[m,] + cp.entropy[a,]
         }
-        for (e in c(1:no.events)) {
+        for (e in seq_len(no.events)) {
             #cp.entropy.1[5,e] <- c.entropy(kf[i.reader,k,e]/2+0.5,k.desired[k])
             cp.entropy[m+1,e] <- cp.entropy[m+1,e] + KL.divergence(k.desired[k],kf.of.reader[k,e]/2+0.5)
         }
@@ -454,7 +454,7 @@ structural.complexity <- function(plot.seq, # sequence of event IDs in discourse
     str.complexity <- array(0, c(4, n))
     # 1 - Preceding-events omitted (past hidden)
     max.eid <- 0
-    for (i in c(1:n)) {
+    for (i in seq_len(n)) {
         if (max.eid < story.seq[i]) max.eid <- story.seq[i]
         str.complexity[1,i] <- max.eid - i
     }
@@ -642,14 +642,16 @@ suspense.situation <- function(kf.r, kf.c, kf.c.r, alpha.A = 0.3, alpha.B = 0.2,
 # Example: plotting KF of single agent
 plot.agent.kf <- function(kf, agent.name, agent.index) {
     kn = dim(kf)[2]
-    col = c(1:kn)
+    col = seq_len(kn)
     layout(mat=matrix(c(1,2), nrow=2, ncol=1), heights=c(0.9,0.1))
-    ts.plot(t(kf[agent.index,,]), col=col,
+    plot.data <- kf[agent.index,,]
+    if (nk > 1) plot.data <- t(plot.data)
+    ts.plot(plot.data, col=col,
             xlab="Event order", ylab="Knowledge state",
             main=paste("Knowledge flow of", agent.name))
     par(mar=c(0,0,0,0),mgp=c(0,0,0))
     plot.new()
-    legend("top",paste0("K",c(1:kn)), col=col, lty=1, box.lwd=0, horiz=TRUE)
+    legend("top",paste0("K",seq_len(kn)), col=col, lty=1, box.lwd=0, horiz=TRUE)
 }
 
 # Example: plotting all KFs collectively
@@ -666,24 +668,28 @@ plot.kf.all <- function(kf, kf.r, agent.names, note) {
   index <- paste0("(", sapply(a:(a + no.agents), intToUtf8), ") ", agent.names)
   index.r <- paste0(index, "|R")
   col <- 2:(no.knowledge + 1)
-  lty <- 1:no.knowledge
+  lty <- seq_len(no.knowledge)
   
   def.par <- par()
   # all KFs
-  sapply(1:no.agents, function(a) {
+  sapply(seq_len(no.agents), function(a) {
     par(mar = c(5,2.5,0,2), mgp=c(1.5,0.5,0))
-    ts.plot(t(kf[a, 1:no.knowledge,]), col=col, lty=lty, xlab="Event order", ylab="Knowledge state", ylim=c(-1,1))
+    plot.data <- kf[a, seq_len(no.knowledge),]
+    if (no.knowledge > 1) plot.data <- t(plot.data)
+    ts.plot(plot.data, col=col, lty=lty, xlab="Event order", ylab="Knowledge state", ylim=c(-1,1))
     title(sub=index[a], mgp=c(2.5,0,0), cex.sub=1.3)
   })
   # all KFs w.r.t reader
-  sapply(1:no.agents, function(a) {
+  sapply(seq_len(no.agents), function(a) {
     par(mar=c(5,2.5,0,2), mgp=c(1.5,0.5,0))
-    ts.plot(t(kf.r[a, 1:no.knowledge,]), col=col, lty=lty, xlab="Event order", ylab="Knowledge state", ylim=c(-1,1))
+    plot.data <- kf.r[a, seq_len(no.knowledge),]
+    if (no.knowledge > 1) plot.data <- t(plot.data)
+    ts.plot(plot.data, col=col, lty=lty, xlab="Event order", ylab="Knowledge state", ylim=c(-1,1))
     title(sub=index.r[a], mgp=c(2.5,0,0), cex.sub=1.3)
   })
   par(mar=c(0,0,0,0), mgp=c(0,0,0))
   plot.new()
-  legend("right", c(note, paste0("K", 1:no.knowledge)),col=1:(no.knowledge+1),lty=0:no.knowledge, bty='n', horiz=TRUE)#, cex=0.9)
+  legend("right", c(note, paste0("K", seq_len(no.knowledge))),col=seq_len(no.knowledge+1),lty=0:no.knowledge, bty='n', horiz=TRUE)#, cex=0.9)
   
   #par(def.par)
 }

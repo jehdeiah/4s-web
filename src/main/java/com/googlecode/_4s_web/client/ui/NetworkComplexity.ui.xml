@@ -11,7 +11,8 @@
 <!-- 		<p> -->
 <!-- 			<g:Button styleName="{style.important}" ui:field="button" >Analyze</g:Button> -->
 <!-- 		</p> -->
-		<iframe id="shiny" src="https://jehdeiah.shinyapps.io/knowledge_flow/" 
+<!-- 		<iframe id="shiny" src="https://jehdeiah.shinyapps.io/knowledge_flow/"  -->
+			<iframe id="shiny" src="http://127.0.0.1:6840"
 				 style="position:absolute; left:10%; width:80%; height:800px; border:none"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 

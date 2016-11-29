@@ -11,7 +11,12 @@ ui <- shinyUI(bootstrapPage(
 
     window.addEventListener("message", function (e) {
       var el = $(document).find(".run"); 
-      el[0].mydata = JSON.parse(e.data);
+      //el[0].mydata = JSON.parse(e.data);
+      var msg = JSON.parse(e.data);
+      if (!el[0].mydata) el[0].mydata = msg;
+      if (msg.type) el[0].mydata.type = msg.type;
+      if (msg.data) el[0].mydata.data = msg.data;
+      if (msg.param) el[0].mydata.param = msg.param;
     });
 
     $(document).on("click", "button.run", function(evt) {
@@ -80,10 +85,12 @@ server <- shinyServer(function(input, output) {
 
     output$main_plot = renderPlot({
       if (!is.null(input$analysis)) {
+        # 1. Event network-based complexity
         if (input$analysis$type == "str.comp") {
           plot.str.complexity(input$analysis$data$event_seq, input$analysis$data$plot_seq)
         }
-        else if (input$analysis$type == "kf"){
+        # 2. Knowledge flow
+        else if (input$analysis$type == "kf" && !is.null(input$analysis$param)){
           # story
           story <- list(title="TBA",
                         no.agents=length(input$analysis$data$agents),
@@ -118,13 +125,17 @@ server <- shinyServer(function(input, output) {
             knowledge.structure$impact[row$info, row$know] <- row$impact
           }
           
-          order <- "Discoure"
+          order <- input$analysis$param$order
           kf <- knowledge.flow(knowledge.structure, perspective.of.reader=FALSE, order=tolower(order), update.method=DST)
           kf.r <- knowledge.flow(knowledge.structure, perspective.of.reader=TRUE, order=tolower(order), update.method=DST)
-          
-          plot.kf.all(kf, kf.r, story$agents, "")
-          #plot.agent.kf(kf, story$agent[1], 1)
+          i.agent <- as.integer(input$analysis$param$agent / 2) + 1
+          if (i.agent > 1 && (input$analysis$param$agent %% 2) == 1) kf <- kf.r
+          agent <- story$agents[i.agent]
+          kn.list <- simplify2array(input$analysis$param$knlist)
+          #plot.kf.all(kf, kf.r, story$agents, "")
+          plot.agent.kf(kf, kn.list, agent, i.agent)
         }
+        # 3. Entropy-based complexity
         else if (input$analysis$type == "ent.comp") {
           # story
           story <- list(title="TBA",
@@ -164,6 +175,15 @@ server <- shinyServer(function(input, output) {
           kf <- knowledge.flow(knowledge.structure, perspective.of.reader=FALSE, order=tolower(order), update.method=DST)
           kf.r <- knowledge.flow(knowledge.structure, perspective.of.reader=TRUE, order=tolower(order), update.method=DST)
           
+          # Parameters
+          k.desired <- simplify2array(input$analysis$data$know_type)
+          i.reader <- match(input$analysis$param$reader, story$agents)
+          r.agents <- simplify2array(input$analysis$param$agents)
+          i.r.agents <- match(r.agents, story$agents)
+          
+          cp.entropy <- narrative.complexity(story$no.events, kf[i.reader,,], kf.r, i.r.agents, k.desired)
+          
+          plot.ent.complexity(cp.entropy, r.agents)
         }
         else {
           

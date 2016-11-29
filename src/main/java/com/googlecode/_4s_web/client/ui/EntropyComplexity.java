@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,29 +32,23 @@ import com.googlecode._4s_web.client.entity.PerceptionEntity;
 import com.googlecode._4s_web.client.ui.NetworkComplexity.SimpleEvent;
 import com.googlecode._4s_web.shared.Interval;
 
-public class KnowledgeFlow extends Composite {
+public class EntropyComplexity extends Composite {
 
-	private static KnowledgeFlowUiBinder uiBinder = GWT
-			.create(KnowledgeFlowUiBinder.class);
+	private static EntropyComplexityUiBinder uiBinder = GWT
+			.create(EntropyComplexityUiBinder.class);
 
-	interface KnowledgeFlowUiBinder extends UiBinder<Widget, KnowledgeFlow> {
+	interface EntropyComplexityUiBinder extends UiBinder<Widget, EntropyComplexity> {
 	}
 
 	/**
 	 * 자바 스크립트로 입력 자료 만들어서 분석 요청하기  
 	 */
-	public native void callShiny(Element thisScope, String data) /*-{
+	public native void callShiny(Element thisScope, String data, String param) /*-{
 		var shinyframe = thisScope.getElementsByTagName("iframe")[0];
-		var msg = "{\"type\": \"kf\", \"data\":" + data + "}";
+		var msg = "{\"type\": \"ent.comp\", \"data\":" + data + ", \"param\":" + param + "}";
 		shinyframe.contentWindow.postMessage(msg, shinyframe.src);
 	}-*/;
-
-	public native void callAnalysis(Element thisScope, String param) /*-{
-		var shinyframe = thisScope.getElementsByTagName("iframe")[0];
-		var msg = "{\"param\":" + param + "}";
-		shinyframe.contentWindow.postMessage(msg, shinyframe.src);
-	}-*/;
-
+	
 	/*
 	 * 캐시에서 읽어들일 엔티티 배열형
 	 */
@@ -67,21 +60,10 @@ public class KnowledgeFlow extends Composite {
 	final ImpactEntity[] impactArrayType = new ImpactEntity[0];
 
 	
-	String h1Title = "Knowledge Flow";
-
-	public KnowledgeFlow() {
+	public EntropyComplexity() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
-	public KnowledgeFlow(String heading) {
-		h1Title = heading;
-		initWidget(uiBinder.createAndBindUi(this));
-	}
-	
-	protected void onLoad() {
-		heading.setHTML("<h1 style=\"margin:0\">" + h1Title + "</h1>");
-	}
-
 	/*
 	 * 사건 네트워크 기반 복잡도와 동일하게 이벤트 순서를 매긴다.
 	 */
@@ -91,48 +73,14 @@ public class KnowledgeFlow extends Composite {
 		public double discourseTime;
 	};
 	
-	@UiField
-	HTML heading;
-	@UiField
-	ListBox agentList;
-	@UiField
-	ListBox knowledgeList;
-	@UiField
-	ListBox orderList;
-	
-	@UiHandler("agentList")
-	void onChangeAgent(ChangeEvent e) {
-		run();
-	}
-	
-	@UiHandler("knowledgeList")
-	void onChangeKnowledge(ChangeEvent e) {
-		run();
-	}
-	
-	@UiHandler("orderList")
-	void onChangeOrder(ChangeEvent e) {
-		run();
-	}
-	
-	protected void run() {
-		int agent = agentList.getSelectedIndex() + 1;
-		String order = orderList.getSelectedValue();
-		String knList = "";
-		for (int i=0; i<knowledgeList.getItemCount(); i++) {
-			if (knowledgeList.isItemSelected(i)) knList += (i+1) + ",";
-		}
-		if (knList.length() > 0) {
-			String param = "{ \"agent\":" + agent + "," 
-							+ "\"knlist\":[" + knList.substring(0, knList.length() - 1) + "],"
-							+ "\"order\":\"" + order + "\" }";
-			callAnalysis(DOM.asOld(getElement()), param);
-		}
-	}
+	//@UiField
+	//ListBox agentList;
 	
 	public	void analyze() {
+		String readerParam = "\"Reader\"";
 		String characterParam = "";
 		String knowledgeParam = "";
+		String knowledgeTypeParam = "";
 		String infoParam = "";
 		String eventSeq, plotSeq;
 		HashMap<Long, Integer> agentMap = new HashMap<Long, Integer>();
@@ -141,18 +89,16 @@ public class KnowledgeFlow extends Composite {
 		HashMap<Long, Integer> knowledgeMap = new HashMap<Long, Integer>();
 		int index;
 		// Fill the list boxes.
-		agentList.clear();
-		knowledgeList.clear();
-		agentList.addItem("Reader");
-		characterParam = "\"Reader\"";
+		//agentList.clear();
+		//agentList.addItem("Reader");
 		index = 1;
 		for (CharacterEntity e : LocalCache.entities(CharacterEntity.class, characterArrayType)) {
-			agentList.addItem(e.getName());
-			agentList.addItem(e.getName() + "|Reader");
-			characterParam += ", \"" + e.getName() + "\"";
+			//agentList.addItem(e.getName());
+			characterParam += "\"" + e.getName() + "\",";
 			++index;
 			agentMap.put(e.getId(), index);
 		}
+		if (index > 1) characterParam = characterParam.substring(0, characterParam.length() - 1);
 		index = 1;
 		for (EventEntity e : LocalCache.entities(EventEntity.class, eventArrayType)) {
 			eventMap.put(e.getId(), index);
@@ -167,13 +113,13 @@ public class KnowledgeFlow extends Composite {
 		if (index > 1) infoParam = infoParam.substring(0, infoParam.length() - 1);
 		index = 1;
 		for (KnowledgeEntity e : LocalCache.entities(KnowledgeEntity.class, knowledgeArrayType)) {
-			knowledgeList.addItem(e.getName());
-			knowledgeList.setItemSelected(index-1, true);
 			knowledgeParam += "\"" + e.getName() + "\",";
+			knowledgeTypeParam += (e.getTruth() ? 1 : 0) + ",";
 			knowledgeMap.put(e.getId(), index);
 			index++;
 		}
 		knowledgeParam = knowledgeParam.substring(0, knowledgeParam.length() - 1);
+		knowledgeTypeParam = knowledgeTypeParam.substring(0, knowledgeTypeParam.length() - 1);
 		// Check whether the story and knowledge structure is properly constructed.
 		if (//LocalCache.count(EventEntity.class) == 0 ||
 			//LocalCache.count(CharacterEntity.class) == 0 ||
@@ -257,13 +203,15 @@ public class KnowledgeFlow extends Composite {
 		String impactParam = "{ \"info\": [" + impactInfo + "], \"knowledge\": [" + impactKnowledge
 								+ "], \"impact\": [" + impactValue + "] }";
 		// Combine all parameters as JSON string.
-		String data = "{ \"agents\": [" + characterParam + "]"
+		String data = "{ \"agents\": [" + readerParam + (characterParam.length() > 0 ? "," + characterParam + "]" : "]")
 					 + ", \"no.events\": " + eventMap.size()  
 					 + ", \"event_seq\": [" + eventSeq + "], \"plot_seq\": [" + plotSeq + "]"
 					 + ", \"info\": [" + infoParam + "], \"knowledge\": [" + knowledgeParam + "]"
-					 + ", \"perception\":" + perceptionParam + ", \"impact\":" + impactParam + "}";
-		callShiny(DOM.asOld(getElement()), data);
-		run();
+					 + ", \"perception\":" + perceptionParam + ", \"impact\":" + impactParam 
+					 + ", \"know_type\": [" + knowledgeTypeParam + "] }";
+		String param = "{ \"reader\": \"Reader\""
+					  + ", \"agents\": [" +	 characterParam + "] }";
+		callShiny(DOM.asOld(getElement()), data, param);
 	}
 
 }

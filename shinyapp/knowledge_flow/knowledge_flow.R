@@ -422,12 +422,11 @@ narrative.complexity <- function(no.events,
             cp.entropy[m,] <- cp.entropy[m,] + cp.entropy[a,]
         }
         for (e in seq_len(no.events)) {
-            #cp.entropy.1[5,e] <- c.entropy(kf[i.reader,k,e]/2+0.5,k.desired[k])
-            cp.entropy[m+1,e] <- cp.entropy[m+1,e] + KL.divergence(k.desired[k],kf.of.reader[k,e]/2+0.5)
+            cp.entropy[m+2,e] <- cp.entropy[m+2,e] + KL.divergence(k.desired[k],kf.of.reader[k,e]/2+0.5)
         }
-        cp.entropy[m+2,1] <- cp.entropy[m,1]
+        cp.entropy[m+1,1] <- cp.entropy[m,1]
         for (i in c(2:no.events)) {
-            cp.entropy[m+2,i] <- cp.entropy[m,i] - cp.entropy[m,i-1]
+            cp.entropy[m+1,i] <- cp.entropy[m,i] - cp.entropy[m,i-1]
         }
     }
     cp.entropy
@@ -640,18 +639,18 @@ suspense.situation <- function(kf.r, kf.c, kf.c.r, alpha.A = 0.3, alpha.B = 0.2,
 
 #-----------------------------------------------------------
 # Example: plotting KF of single agent
-plot.agent.kf <- function(kf, agent.name, agent.index) {
-    kn = dim(kf)[2]
-    col = seq_len(kn)
+plot.agent.kf <- function(kf, kn.list, agent.name, agent.index) {
+    nk = length(kn.list) #dim(kf)[2]
+    col = seq_len(nk)
     layout(mat=matrix(c(1,2), nrow=2, ncol=1), heights=c(0.9,0.1))
-    plot.data <- kf[agent.index,,]
+    plot.data <- kf[agent.index,kn.list,]
     if (nk > 1) plot.data <- t(plot.data)
     ts.plot(plot.data, col=col,
             xlab="Event order", ylab="Knowledge state",
             main=paste("Knowledge flow of", agent.name))
     par(mar=c(0,0,0,0),mgp=c(0,0,0))
     plot.new()
-    legend("top",paste0("K",seq_len(kn)), col=col, lty=1, box.lwd=0, horiz=TRUE)
+    legend("top",paste0("K",kn.list), col=col, lty=1, box.lwd=0, horiz=TRUE)
 }
 
 # Example: plotting all KFs collectively
@@ -712,6 +711,28 @@ plot.str.complexity <- function(event.seq, plot.seq) {
   plot.new()
   legend("right", label,
          col=col[ln],lty=lty[ln], bty='n', horiz=FALSE, cex=0.8)
+}
+
+# Example: plotting entropy-based complexity
+plot.ent.complexity <- function(cp.entropy, agents) {
+  n <- length(agents)
+  col <- c(4,5:(n+4),2,3,n+5)
+  lty <- c(3,rep(c(2,4),(n+1)/2)[1:n],1,1,1)
+  lwd <- c(1.2,rep(1.2,n),1.2,1.2,0.8)
+  label <- c(expression('H'['R']*'(t)'), 
+             as.expression(lapply(paste0("(",agents,",t)"), function(x) bquote('H'['C']*.(x)))),
+             expression('H'['P']*'(t)'), 
+             expression(Delta*'H'['P']*'(t)'), 
+             expression('H'['E']*'(t)'))
+
+    layout(mat=matrix(c(1,2), nrow=1, ncol=2), widths=c(0.8,0.2))
+  par(mar = c(3,2.5,2,0.6), mgp=c(1.5,0.5,0))
+  ts.plot(t(cp.entropy), col=col, lwd=lwd, lty=lty, xlab="Discoure order", ylab="Etropy")
+  title(main="Entropy-Based Complexity")
+  par(mar=c(0,0,0,0),mgp=c(0,0,0))
+  plot.new()
+  legend("right", label,
+         col=col,lty=lty, bty='n', horiz=FALSE, cex=0.8)
 }
 
 #===========================================================

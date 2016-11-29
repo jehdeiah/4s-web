@@ -38,6 +38,7 @@ import com.googlecode._4s_web.client.ui.CategoryView;
 import com.googlecode._4s_web.client.ui.CharacterNetwork;
 import com.googlecode._4s_web.client.ui.CheckList;
 import com.googlecode._4s_web.client.ui.DiscourseTimeline;
+import com.googlecode._4s_web.client.ui.EntropyComplexity;
 import com.googlecode._4s_web.client.ui.EventNetwork;
 import com.googlecode._4s_web.client.ui.KnowledgeFlow;
 import com.googlecode._4s_web.client.ui.KnowledgeStructure;
@@ -280,7 +281,7 @@ public class StoryApp implements EntryPoint {
 		// Split panel for complexity analysis
 		LayoutPanel cmp = new LayoutPanel();
 		NetworkComplexity netcomp = new NetworkComplexity();
-		HTMLPanel entcomp = new HTMLPanel("<h1>Entropy-based Complexity</h1>");
+		EntropyComplexity entcomp = new EntropyComplexity();
 		cmp.add(netcomp);
 		cmp.add(entcomp);
 		cmp.setWidgetLeftWidth(netcomp, 0, Unit.PCT, 50, Unit.PCT);
@@ -396,6 +397,7 @@ public class StoryApp implements EntryPoint {
 			break;
 		case TAB_OUT_COMPLEXITY:
 			((NetworkComplexity)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(0)).analyze();
+			((EntropyComplexity)((LayoutPanel)tabLayoutPanel.getWidget(tab)).getWidget(1)).analyze();
 			break;
 		case TAB_OUT_SUSPENSE:
 			break;

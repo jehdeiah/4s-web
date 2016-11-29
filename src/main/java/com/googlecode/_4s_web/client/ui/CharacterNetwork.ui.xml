@@ -4,5 +4,14 @@
 	<ui:style type="com.googlecode._4s_web.client.ui.CharacterNetwork.MyStyle">
 		.node text { pointer-events: none; font: 10px sans-serif;}
 	</ui:style>
-	<g:FlowPanel ui:field='drawingPanel'></g:FlowPanel>
+	<g:LayoutPanel>
+		<g:layer left="0" top="0" width="100%" height="6em">
+			<g:HTML>
+				<h1>Character Graph</h1>
+			</g:HTML>
+		</g:layer>
+		<g:layer left="0" top="6em" width="100%" bottom="0">
+			<g:FlowPanel ui:field='drawingPanel'></g:FlowPanel>
+		</g:layer>
+	</g:LayoutPanel>
 </ui:UiBinder> 

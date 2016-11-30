@@ -43,7 +43,9 @@ import com.googlecode._4s_web.client.ui.EventNetwork;
 import com.googlecode._4s_web.client.ui.KnowledgeFlow;
 import com.googlecode._4s_web.client.ui.KnowledgeStructure;
 import com.googlecode._4s_web.client.ui.NetworkComplexity;
+import com.googlecode._4s_web.client.ui.QnAPattern;
 import com.googlecode._4s_web.client.ui.StoryTimeline;
+import com.googlecode._4s_web.client.ui.SuspenseSituation;
 
 /**
  * 스토리 웹 앱 모듈 <br>
@@ -293,11 +295,11 @@ public class StoryApp implements EntryPoint {
 		tabWidget[TAB_IN_KNOWLEDGE_STRUCTURE] = new KnowledgeStructure(storyService, mainBus);
 		tabWidget[TAB_OUT_CHECKLIST] = cl;
 		tabWidget[TAB_OUT_NETWORK] = cen;
-		tabWidget[TAB_OUT_QA_PATTERN] = new HTML("Q&A Pattern");
+		tabWidget[TAB_OUT_QA_PATTERN] = new QnAPattern();
 		tabWidget[TAB_OUT_KNOWLEDGE_FLOW] = kf;
 		tabWidget[TAB_OUT_CATEGORY_VIEW] = new CategoryView(storyService, mainBus);
 		tabWidget[TAB_OUT_COMPLEXITY] = cmp;
-		tabWidget[TAB_OUT_SUSPENSE] = new HTML("Suspense situation");
+		tabWidget[TAB_OUT_SUSPENSE] = new SuspenseSituation();
 		// 개요 탭만 추가하고, 스토리를 고르면 나머지 탭들을 추가한다.
 		inputTabBar.add(tabHeaderUIs[0]);
 		tabHeaderUIs[0].addStyleName("tabBar-selected");

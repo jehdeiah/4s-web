@@ -18,7 +18,7 @@ import com.googlecode.objectify.annotation.Parent;
 @Entity
 @Cache
 @ToString
-@EqualsAndHashCode(of={"id"})
+@EqualsAndHashCode(of={"id", "story"})
 public class EventRelation implements HasValidation, Serializable {
 	
 	/**

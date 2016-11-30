@@ -2,7 +2,6 @@ package com.googlecode._4s_web.client.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;

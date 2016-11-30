@@ -1,0 +1,18 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	
+	</ui:style>
+	<g:HTMLPanel>
+		<h1>Demo Page about Incendies (produced via R)</h1>
+		<div style="position:absolute; left:0; width:50%; top:6em; bottom:1em; text-align:center; overflow-x:hidden; overflow-y:auto;">
+			<h2>Realizing Meta-knowledge</h2>
+			<img src="image/Fig2.png" width="100%"/>
+		</div>
+		<div style="position:absolute; left:50%; width:50%; top:6em; bottom:1em; text-align:center; overflow-x:hidden; overflow-y:auto;">
+			<h2>Q&amp;A Patterns during discourse</h2>
+			<img src="image/Fig5.png" width="100%"/>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 

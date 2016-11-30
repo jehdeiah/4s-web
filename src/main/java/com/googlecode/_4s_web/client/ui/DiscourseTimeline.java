@@ -71,7 +71,7 @@ import com.googlecode._4s_web.shared.Interval;
  *
  */
 public class DiscourseTimeline extends AbstractStoryPanel 
-			implements HasEventPropertyPanel {
+			implements HasEventPropertyPanel, XPointConvertible {
 
 	private static DiscourseTimelineUiBinder uiBinder = GWT
 			.create(DiscourseTimelineUiBinder.class);
@@ -455,6 +455,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 
 	private PopupPanel menuPanelOnEvent = null;
 	private EventUI contextEvent = null;
+	private GuidelinePanel guidelinePanel = null;
 
 	final public int EventMargin = 3; // px
 	final public int DefaultEventWidth = 100; // px
@@ -518,6 +519,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 		discourseEventBag = new TreeSet<EventUI>();
 		timePointBag = new ArrayList<SimplePanel>();
 		discourseTimePointBag = new ArrayList<SimplePanel>();
+		guidelinePanel = new GuidelinePanel(this, 2.0d, false);
 	}
 
 	/**
@@ -525,6 +527,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 	 */
 	protected void onLoad() {
 		super.onLoad();
+		plotGuidelineContainer.add(guidelinePanel);
 		// 가로축 스크롤 추가하기. 
 		// 환경에 따라 화면 구성이 달라지는 것을 막기 위해 아예 스크롤 레이어를 둔다.
 		editorScroll.getElement().getStyle().setOverflowX(Overflow.SCROLL);
@@ -601,6 +604,7 @@ public class DiscourseTimeline extends AbstractStoryPanel
 					timelineEditor.getElement().getStyle().setCursor(Cursor.AUTO);
 				}
 				hilightDiscourseTimePoint(e.getX());
+				guidelinePanel.hilightGuideLine(e.getX());
 			}
 		}, MouseMoveEvent.getType());
 		timelineEditor.addDomHandler(new MouseOutHandler() {
@@ -772,6 +776,8 @@ public class DiscourseTimeline extends AbstractStoryPanel
 		drawStoryTimePoints();
 		updateDiscourseTimePoints();
 		timelineEditorWidth = timelineEditor.getOffsetWidth();
+		
+		guidelinePanel.load();
 	}
 
 	@Override
@@ -1163,17 +1169,25 @@ public class DiscourseTimeline extends AbstractStoryPanel
 		return y / basePanelHeight * 100.;
 	}
 
-	double getTimelineX(int screenOffsetX) {
+	@Override
+	public HTMLPanel getTimelineEditor() {
+		return timelineEditor;
+	}
+	
+	@Override
+	public double getTimelineX(int screenOffsetX) {
 		return getTimelineX(screenOffsetX, 0);
 	}
 
-	double getTimelineX(int screenOffsetX, int delta) {
+	@Override
+	public double getTimelineX(int screenOffsetX, int delta) {
 		final double width = timelineEditor.getOffsetWidth();
 		double pct = (double)(screenOffsetX - delta) / width * 100.0;
 		return Math.round(pct*resolutionBase)/resolutionBase;
 	}
 	
-	int getTimelineOffsetX(double pct) {
+	@Override
+	public int getTimelineOffsetX(double pct) {
 		return (int)(timelineEditor.getOffsetWidth() * pct /100);// + 0.5);
 	}
 
@@ -1250,6 +1264,9 @@ public class DiscourseTimeline extends AbstractStoryPanel
 
 	@UiField
 	CheckBox uniformPlot;
+	
+	@UiField
+	LayoutPanel plotGuidelineContainer;
 	
 	@UiHandler("newEventButton")
 	void onClickNewEvent(ClickEvent e) {

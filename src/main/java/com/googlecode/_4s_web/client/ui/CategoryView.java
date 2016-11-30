@@ -76,7 +76,7 @@ import com.googlecode._4s_web.shared.Interval;
  * @author 유병국, jehdeiah
  *
  */
-public class CategoryView extends AbstractStoryPanel implements HasEventPropertyPanel{	
+public class CategoryView extends AbstractStoryPanel implements HasEventPropertyPanel, XPointConvertible {	
 	
 	/**
 	 * UI Binder for CategoryView
@@ -638,6 +638,10 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 	Map<String, Map<String, CategoryUI>> subCategoryBag;
 	Map<String, SortedSet<CategoryUI>> subCategorySet;
 	
+	/*
+     * 가이드 라인 UI 요소
+     */
+    GuidelinePanel guidelinePanel;
 	
 	/**
 	 * 담화 시간 표시선을 모아두는 Bag.
@@ -722,7 +726,10 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 	@UiField
 	HTML scrollWidth;	
 	
-	@UiHandler("mainViewSelection")
+    @UiField
+    LayoutPanel plotGuidelineContainer;
+
+    @UiHandler("mainViewSelection")
 	public void onMainViewChange(ChangeEvent event) {
 		String newCategory = mainViewSelection.getItemText(mainViewSelection.getSelectedIndex());
 		if (newCategory.equals(currentMainCategory.getCategory())) return;
@@ -757,6 +764,7 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 		subCategorySet = new HashMap<String, SortedSet<CategoryUI>>();
 		changedCharacterIds = new HashSet<Long>();
 		changedEventIds = new HashSet<Long>();
+		guidelinePanel        = new GuidelinePanel(this, 2.0d, false);
 	}
 	
 	private void updateMainCategoryList(boolean preserve){
@@ -798,6 +806,8 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 	@Override
 	protected void onLoad() {
 		super.onLoad();
+		
+		plotGuidelineContainer.add(guidelinePanel);
 		
 		updateMainCategoryList(false);
 		updateSubCategoryList(false);
@@ -889,6 +899,7 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 				timelineEditor.getElement().getStyle().setCursor(Cursor.AUTO);
 				hilightCategoryDeco(e.getY());
 				hilightDiscourseTimePoint(e.getX());
+				guidelinePanel.hilightGuideLine(e.getX());
 			}
 		}, MouseMoveEvent.getType());
 		timelineEditor.addDomHandler(new MouseOutHandler() {
@@ -1057,6 +1068,8 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 		}
 		setZoomY(1.0);		
 
+		guidelinePanel.load();
+		
 		updateCategory();		
 		updateEventUI();		
 		
@@ -1673,18 +1686,25 @@ public class CategoryView extends AbstractStoryPanel implements HasEventProperty
 		}
 	}
 
-
-	double getTimelineX(int screenOffsetX) {
+	@Override
+	public HTMLPanel getTimelineEditor() {
+		return timelineEditor;
+	}
+	
+	@Override
+	public double getTimelineX(int screenOffsetX) {
 		return getTimelineX(screenOffsetX, 0);
 	}
 
-	double getTimelineX(int screenOffsetX, int delta) {
+	@Override
+	public double getTimelineX(int screenOffsetX, int delta) {
 		final double width = timelineEditor.getOffsetWidth();
 		double pct = (double)(screenOffsetX - delta) / width * 100.0;
 		return Math.round(pct*resolutionBase)/resolutionBase;
 	}
 	
-	int getTimelineOffsetX(double pct) {
+	@Override
+	public int getTimelineOffsetX(double pct) {
 		return (int)(timelineEditor.getOffsetWidth() * pct /100);// + 0.5);
 	}
 

@@ -28,7 +28,7 @@ import com.googlecode.objectify.stringifier.KeyStringifier;
 @Entity
 @Cache
 @ToString
-@EqualsAndHashCode(of={"id"})
+@EqualsAndHashCode(of={"id", "story"})
 public class Perception implements HasValidation, Serializable {
 
 	/**
